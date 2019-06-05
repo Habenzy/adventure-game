@@ -106,19 +106,13 @@ class InvObj {
   }
 }
 
-//objects list
+//objects list MUST BE BEFORE ROOMS
 const stick = new InvObj('stick', 'A seemingly ordinary stick', true, () => { console.log('The stick breaks...'); player.inventory.pop(stick) });
 const rock = new InvObj('rock', 'A rock. Not very exciting', false, () => { console.log('The rock is impervious, heavy, and boring. You should leave it be...') })
 
 //list of rooms
 const canyon = new Room('canyon', 'You stand in a canyon completely blocked in on three sides, your only path out lies to the north...', [rock], 'field')
 const field = new Room('field', 'You stand in an open field surrounded by forboding forests.\nTo the south a line of cliffs stretches, broken only by a narrow canyon...', [stick], null, 'canyon')
-
-//rooms object with allowable transitions for state machine
-/*let rooms = {
-  'canyon': { canChangeTo: ['north'] },
-  'field': { canChangeTo: ['south'] }
-}*/
 
 let obObjs = {
   'rock': rock,
@@ -152,7 +146,6 @@ async function startGame() {
 async function play() {
   let input = await ask('>_')
   let sanInput = input.toLowerCase()
-  //all the rules for the game go below, but first let's figure out how to break down the input
   let inputArray = sanInput.split(' ');
   let thisAction = inputArray[0];
   let focus = inputArray[inputArray.length - 1]
