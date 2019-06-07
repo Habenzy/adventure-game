@@ -79,6 +79,17 @@ class Room {
   }
 }
 
+//Items object definition
+class InvObj {
+  constructor(name, desc, takeable, action) {
+    //name and desc should be strings, takeable is a boolean, action should be a function
+    this.name = name;
+    this.description = desc;
+    this.takeable = takeable;
+    this.action = action
+  }
+}
+
 //acceptable commands
 const commands = {
   affirmative: ['yes', 'yesh', 'yup', 'y', 'yeah', 'ok', ''],
@@ -95,17 +106,6 @@ const directions = {
   west: ['w', 'west']
 }
 
-//Objects definition
-class InvObj {
-  constructor(name, desc, takeable, action) {
-    //name and desc should be strings, takeable is a boolean, action is optional, but should be a function
-    this.name = name;
-    this.description = desc;
-    this.takeable = takeable;
-    this.action = action || null
-  }
-}
-
 //objects list MUST BE BEFORE ROOMS
 const stick = new InvObj('stick', 'A seemingly ordinary stick', true, () => { console.log('The stick breaks...'); player.inventory.pop(stick) });
 const rock = new InvObj('rock', 'A rock. Not very exciting', false, () => { console.log('The rock is impervious, heavy, and boring. You should leave it be...') })
@@ -114,12 +114,12 @@ const rock = new InvObj('rock', 'A rock. Not very exciting', false, () => { cons
 const canyon = new Room('canyon', 'You stand in a canyon completely blocked in on three sides, your only path out lies to the north...', [rock], 'field')
 const field = new Room('field', 'You stand in an open field surrounded by forboding forests.\nTo the south a line of cliffs stretches, broken only by a narrow canyon...', [stick], null, 'canyon')
 
-let obObjs = {
+const obObjs = {
   'rock': rock,
   'stick': stick
 }
 
-let obRooms = {
+const obRooms = {
   'canyon': canyon,
   'field': field
 }
@@ -150,10 +150,12 @@ async function play() {
   let thisAction = inputArray[0];
   let focus = inputArray[inputArray.length - 1]
 
+  //exit
   if (sanInput === 'exit') {
     process.exit()
   }
 
+  //show room inventory
   else if (sanInput === 'i') {
     if (player.currentRoom.inventory.length === 0) {
       console.log("There is nothing here...")
@@ -164,6 +166,7 @@ async function play() {
     }
   }
 
+  //show player inventory
   else if (sanInput === 'j') {
     if (player.inventory.length === 0) {
       console.log("What's it got it it's pocketses? Nothing, apparently...")
@@ -174,6 +177,7 @@ async function play() {
     }
   }
 
+  //move
   else if (commands.move.includes(thisAction)) {
     if (inputArray.length === 1) {
       console.log('When beset be fear or doubt\nRun in circles\nScream and shout.');
@@ -240,40 +244,53 @@ async function play() {
     }
   }
   
+  //examine objects
   else if (commands.examine.includes(thisAction) && player.currentRoom.inventory.includes(obObjs[focus])) {
     let item = focus;
     console.log(obObjs[item].description)
     play();
   }
-
   else if (commands.examine.includes(thisAction) && player.inventory.includes(obObjs[focus])) {
     let item = focus;
     console.log(obObjs[item].description)
     play();
   }
 
+  //examine room
   else if (commands.examine.includes(thisAction)) {
     console.log(player.currentRoom.description);
     play();
   }
 
+  //pick up item
   else if (commands.take.includes(thisAction)) {
     let item = obObjs[focus]
-    console.log(player.pickUp(item));
-    play();
+    if (player.currentRoom.inventory.includes(item)) {
+      console.log(player.pickUp(item));
+      play();
+    }
+    else {
+      console.log(`You don't see any ${focus}s here...`)
+      play()
+    }
   }
 
+  //use item
   else if (commands.use.includes(thisAction)) {
     let item = obObjs[focus]
-    item.action()
-    play();
+    if (player.inventory.includes(item) || player.currentRoom.inventory.includes(item)) {
+      item.action()
+      play();
+    } else {
+      console.log("You can't use what isn't here...");
+      play()
+    }
   }
 
   else {
     console.log("I don't know how to do that...");
     play();
   }
-
 }
 
 startGame();
