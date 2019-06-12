@@ -10,6 +10,8 @@ function ask(questionText) {
     readlineInterface.question(questionText, resolve);
   });
 };
+//------------------------------------------------------------------------------------------------------------------------
+//Rule sets and templates
 
 //player object
 const player = {
@@ -23,16 +25,21 @@ const player = {
   },
   //move
   changeRoom: (room) => {
-    player.currentRoom = room
+    if (!room.isLocked) {
+      player.currentRoom = room
+    } else {
+      console.log(`The ${room.name} is locked...`)
+    }
   },
   //pick up
   pickUp: (item) => {
     if (item.takeable === true) {
-      console.log(player.inventory)
       player.inventory.push(item);
-      return (`You pick up ${item.name}`)
+      player.currentRoom.inventory.pop(item)
+      return `You pick up a ${item.name}`
+    } else { 
+      return "You can't take that" 
     }
-    else return ("You can't take that")
   },
   //use items
   useItem: (item) => {
@@ -55,12 +62,15 @@ class Room {
     this.west = west || null;
 
     this.unlock = () => {
-      if (this.isLocked === false) {
-        return ('The door is already unlocked')
-      }
-      else {
-        this.isLocked = false;
-        return ("The door unlocks with an audible click.")
+      if (player.inventory.includes(obObjs['key'])) {
+        if (this.isLocked === false) {
+          return ('The door is already unlocked')
+        } else {
+          this.isLocked = false;
+          return ("The door unlocks with an audible click.")
+        }
+      } else {
+        return "You don't have a key..."
       }
     };
 
@@ -93,10 +103,11 @@ class InvObj {
 //acceptable commands
 const commands = {
   affirmative: ['yes', 'yesh', 'yup', 'y', 'yeah', 'ok', ''],
-  move: ['go', 'move', 'head', 'walk', 'run', 'crawl', 'skip'],
-  examine: ['look', 'examine', 'check', 'study'],
+  move: ['go', 'move', 'head', 'walk', 'run', 'crawl', 'skip', 'enter'],
+  examine: ['look', 'examine', 'check', 'study', 'inspect'],
   take: ['pick', 'take', 'grab', 'steal', 'buy'],
-  use: ['use', 'give', 'eat', 'drink']
+  use: ['use', 'give', 'eat', 'drink'],
+  unlock: ['unlock', 'open']
 }
 
 const directions = {
@@ -106,25 +117,58 @@ const directions = {
   west: ['w', 'west']
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//object definitions
+
 //objects list MUST BE BEFORE ROOMS
 const stick = new InvObj('stick', 'A seemingly ordinary stick', true, () => { console.log('The stick breaks...'); player.inventory.pop(stick) });
-const rock = new InvObj('rock', 'A rock. Not very exciting', false, () => { console.log('The rock is impervious, heavy, and boring. You should leave it be...') })
+const rock = new InvObj('rock', 'A rock. Not very exciting, but something shiney catches your eye...', false, () => { console.log('The rock is impervious, heavy, and boring. You should probably leave it be...') });
+const key = new InvObj('key', 'A small key', true, () => {
+  if (player.currentRoom.north && obRooms[player.currentRoom.north].isLocked) {
+    console.log(obRooms[player.currentRoom.north].unlock())
+  } else if (player.currentRoom.south && obRooms[player.currentRoom.south].isLocked) {
+    console.log(obRooms[player.currentRoom.south].unlock())
+  } else if (player.currentRoom.east && obRooms[player.currentRoom.east].isLocked) {
+    console.log(obRooms[player.currentRoom.east].unlock())
+  } else if (player.currentRoom.west && obRooms[player.currentRoom.west].isLocked) {
+    console.log(obRooms[player.currentRoom.west].unlock())
+  } else {
+    console.log('There is nothing to unlock here...')
+  }
+})
+
 
 //list of rooms
-const canyon = new Room('canyon', 'You stand in a canyon completely blocked in on three sides, your only path out lies to the north...', [rock], 'field')
-const field = new Room('field', 'You stand in an open field surrounded by forboding forests.\nTo the south a line of cliffs stretches, broken only by a narrow canyon...', [stick], null, 'canyon')
+const canyon = new Room('canyon', 'You stand in a canyon completely blocked in on three sides.\nThe cannyon is littered with rocks. Your only path out lies to the north...', [rock, key], 'field')
+const field = new Room('field', 'You stand in an open field surrounded by forboding forests.\nTo the south a line of cliffs stretches, broken only by a narrow canyon.\n Sticks litter the ground...', new Array(10).fill(stick), null, 'canyon', 'clearing');
+const clearing = new Room('clearing', 'A small, overgrown clearing. To the east is a run down shack...', [], null, null, 'shack', 'field');
+const shack = new Room('shack', "Broken chairs and a dusty table. There's nothing of interest here", [], null, null, null, 'clearing');
+shack.isLocked = true;
 
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//lookup tables
+
+//items table
 const obObjs = {
+  'rocks': rock,
   'rock': rock,
-  'stick': stick
+  'sticks':stick,
+  'stick': stick,
+  'shiney': key,
+  'key' : key
 }
 
+//rooms table
 const obRooms = {
   'canyon': canyon,
-  'field': field
+  'field': field,
+  'clearing' : clearing,
+  'shack': shack
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //actual game implementation definition
+
 async function startGame() {
   player.name = null;
   let userName = await ask('Greetings adventurer! What is your name?\n>_ ');
@@ -185,7 +229,7 @@ async function play() {
     }
     else {
       let direction = focus;
-      if (directions.north.includes(direction)) {
+      if (directions.north.includes(direction) || direction === player.currentRoom.north) {
         direction = 'north';
         if (player.currentRoom.north) {
           console.log("Moving North...");
@@ -198,7 +242,7 @@ async function play() {
           play()
         }
       }
-      else if (directions.south.includes(direction)) {
+      else if (directions.south.includes(direction) || direction === player.currentRoom.south) {
         direction = 'south';
         if (player.currentRoom.south) {
           console.log('Moving South...')
@@ -211,7 +255,7 @@ async function play() {
           play()
         }
       }
-      else if (directions.east.includes(direction)) {
+      else if (directions.east.includes(direction) || direction === player.currentRoom.east) {
         direction = 'east';
         if (player.currentRoom.east) {
           console.log('Moving East...')
@@ -224,10 +268,10 @@ async function play() {
           play()
         }
       }
-      else if (directions.west.includes(direction)) {
+      else if (directions.west.includes(direction) || direction === player.currentRoom.west) {
         direction = 'west';
         if (player.currentRoom.west) {
-          console.log('Moving West...')
+          console.log('Moving west...')
           player.changeRoom(obRooms[player.currentRoom.west]);
           console.log(player.currentRoom.enterRoom())
           play();
@@ -243,7 +287,7 @@ async function play() {
       }
     }
   }
-  
+
   //examine objects
   else if (commands.examine.includes(thisAction) && player.currentRoom.inventory.includes(obObjs[focus])) {
     let item = focus;
@@ -287,10 +331,25 @@ async function play() {
     }
   }
 
+  else if (commands.unlock.includes(thisAction)) {
+    if(player.inventory.includes(key)){
+      key.action();
+      play()
+    }
+    else {
+      console.log("You don't have a key...");
+      play()
+    }
+  }
+
   else {
-    console.log("I don't know how to do that...");
+    console.log("I don't know how to " + thisAction);
     play();
   }
 }
 
 startGame();
+
+//To Do:
+//  NPCs or the myst approach? Which should I do? NPCs would need another chunk of behavioral code & object template...
+// create an actual narative/world
