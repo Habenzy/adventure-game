@@ -140,10 +140,28 @@ const key = new InvObj('key', 'A small key', true, () => {
 
 //list of rooms
 const canyon = new Room('canyon', 'You stand in a canyon completely blocked in on three sides.\nThe cannyon is littered with rocks. Your only path out lies to the north...', [rock, key], 'field')
-const field = new Room('field', 'You stand in an open field surrounded by forboding forests.\nTo the south a line of cliffs stretches, broken only by a narrow canyon.\n Sticks litter the ground...', new Array(10).fill(stick), null, 'canyon', 'clearing');
-const clearing = new Room('clearing', 'A small, overgrown clearing. To the east is a run down shack...', [], null, null, 'shack', 'field');
+const field = new Room('field', 'You stand in an open field surrounded by forboding forests.\nTo the south a line of cliffs stretches, broken only by a narrow canyon.\n Sticks litter the ground...', new Array(10).fill(stick), 'deepForest', 'canyon', 'clearing', 'deepForestW');
+const clearing = new Room('clearing', 'A small, overgrown clearing. To the east is a run down shack...', [], 'deepForest', null, 'shack', 'field');
 const shack = new Room('shack', "Broken chairs and a dusty table. There's nothing of interest here", [], null, null, null, 'clearing');
 shack.isLocked = true;
+const deepForestW = new Room('deepForestW', 'The forest is deep, and dark.\nThe only paths through the tangled underbrush are game trails.\nThe trees seem to thin out to the East. There is a noticable rise to the west,\nand hazy mountain peaks rize above the treeline.\nTo the south is an unbroken line of cliffs', new Array(10).fill(stick), 'glade', null, 'field', 'foothills');
+const glade = new Room('glade', 'An ancient tree has fallen here taking down a swath of trees, and leaving an idylic glade', [], 'forestW', 'deepForestW', 'deepForest', 'foothills');
+const foothills = new Room('foothills', "You come out of the forest into rolling hills.\nTo the west a mighty mountain range blocks out the sky.\nA plume of smoke drifts across the sky to the north...", [], 'hutYard', null, 'glade', 'mountains');
+const hutYard = new Room('hutYard', "A small hut is nestled amongst the base of the mountains to the west.\nTo the East the forest looms. A road leads into cultivated fields to the North.\nRolling hills stretch as far as the eye can see to the south...", [], null, 'foothills', 'forestW', 'hut');
+const hut = new Room('hut', "The hut is a single room, cozy, and warm from the fire burning in the hearth.\nDespite the cleanliness of the cabin, and fire, there are no signs of the occupants...", [], null, null, 'hutYard');
+hut.isLocked = true;
+const forestW = new Room('forestW', "The forest is dark and menacing, visibility is low\nand you hear animal noises all around. The trees seem to thin out to the North.\nIt would not be wise to linger...", [],'fieldW', 'glade', 'forest', 'hutYard' );
+const forest = new Room('forest', 'The trees are thinner here.\nYou can see cultivated fields through the trees to the north...', [], 'wheatField', 'deepForest', 'forestE','forestW' );
+const deepForest = new Room('deepForest', "The forest is dark and menacing, visibility is low\nand you hear animal noises all around.\nIt would b unwise to linger...", [], 'forest', 'field', 'deepForestE', 'glade');
+const deepForestE = new Room('deepForestE', "The forest is dark and menacing, visibility is low\nand you hear animal noises all around. It would not be wise to linger.\nThe trees seem to thin a bit to the East, and the South...", [], 'forestE', 'clearing', 'deepForest', 'riverS');
+const forestE = new Room('forestE', "The trees are thinner here.\nYou can see cultivated fields through the trees to the north.\nYou here the sound of running water to the East...", [], 'fieldE', 'deepForestE', 'river', 'forest');
+const river = new Room('river', "You stand on the Western bank of a river flowing swiftly from South to North\nTo the West the forest looms...", [], 'riverN', 'riverS', null, 'forestE');
+const riverS = new Room('riverS', "You stand on the Western bank of a river flowing swiftly from South to North\nTo the West the forest looms.\nThe southern cliffs can be seen above the treeline to the South...", [], 'river', 'caveEnterance', null, 'deepForestE');
+const riverN = new Room('riverN', "You stand on the Western bank of a river flowing swiftly from South to North\nTo the West cultivated fields spread into the distance.\nTo the North the river dissapears beneath the city walls...", [], null, 'river',null, 'fieldE');
+const fieldC = new Room('fieldC', "A road leads through fields of golden wheat.\nTo the north a set of massive gates are set into a gigantic wall.\nRoofs, and towers can be seen beyond the walls.\nMore fields stretch to the East and West. To the south the forest looms.\nEverything is earily silent...", [], null, 'forest', 'fieldE', 'fieldW');
+const fieldE = new Room('fieldE', "You stand amidst a field of ripe wheat. A river flows along the Eastern side of the field.\nThe city walls tower over the Northern end of the field.\nTo the South the forest stretches into the distance...", [], null, 'forestE', 'riverN', 'fieldC');
+const fieldW = new Room('fieldW', "You stand amidst a field of ripe wheat. An impassable mountain range shades the Western side of the field.\nThe city walls tower over the Northern end of the field.\nTo the South the forest stretches into the distance...", [], null, 'forestW', 'fieldC', null)
+
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //lookup tables
@@ -163,7 +181,23 @@ const obRooms = {
   'canyon': canyon,
   'field': field,
   'clearing' : clearing,
-  'shack': shack
+  'shack': shack,
+  'deepForestW': deepForestW,
+  'glade' : glade,
+  'foothills' : foothills,
+  'hutYard' : hutYard,
+  'hut' : hut,
+  'forestW' : forestW,
+  'forest' : forest,
+  'deepForest' : deepForest,
+  'deepForestE' : deepForestE,
+  'forestE' : forestE,
+  'river' : river,
+  'riverS' : riverS,
+  'riverN' : riverN,
+  'fieldC' : fieldC,
+  'fieldE' : fieldE,
+  'fieldW' : fieldW
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
