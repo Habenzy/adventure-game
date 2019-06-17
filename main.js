@@ -195,12 +195,12 @@ const obRooms = {
   'hutyard': hutYard,
   'hut': hut,
   'forestW': forestW,
-  'forestw' : forestW,
+  'forestw': forestW,
   'forest': forest,
   'deepForest': deepForest,
-  'deepforest' : deepForest,
+  'deepforest': deepForest,
   'deepForestE': deepForestE,
-  'deepforeste' : deepForestE,
+  'deepforeste': deepForestE,
   'forestE': forestE,
   'foreste': forestE,
   'river': river,
@@ -286,66 +286,36 @@ async function play() {
       play()
     }
     else {
+      if (focus === 'n') {
+        focus = 'north'
+      }
+      else if (focus === 's') {
+        focus = 'south'
+      }
+      else if (focus === 'e') {
+        focus = 'east'
+      }
+      else if (focus === 'w') {
+        focus = 'west'
+      }
       let direction = focus;
-      if (directions.north.includes(direction) || direction === player.currentRoom.north) {
-        direction = 'north';
-        if (player.currentRoom.north) {
-          console.log("Moving North...");
-          player.changeRoom(obRooms[player.currentRoom.north]);
-          console.log(player.currentRoom.enterRoom())
-          play();
-        }
-        else {
-          console.log("You can't go that way...")
-          play()
-        }
+      if (directions[direction].includes(direction) || direction === player.currentRoom[direction].toLowerCase()) {
+        console.log(`Moving ${direction}...`);
+        player.changeRoom(obRooms[player.currentRoom[direction]]);
+        console.log(player.currentRoom.enterRoom())
+        play();
       }
-      else if (directions.south.includes(direction) || direction === player.currentRoom.south) {
-        direction = 'south';
-        if (player.currentRoom.south) {
-          console.log('Moving South...')
-          player.changeRoom(obRooms[player.currentRoom.south]);
-          console.log(player.currentRoom.enterRoom())
-          play();
-        }
-        else {
-          console.log("You can't go that way...")
-          play()
-        }
+      else if (obRooms[player.currentRoom][direction] == undefined) {
+        console.log("You can't go that way...")
+        play()
       }
-      else if (directions.east.includes(direction) || direction === player.currentRoom.east) {
-        direction = 'east';
-        if (player.currentRoom.east) {
-          console.log('Moving East...')
-          player.changeRoom(obRooms[player.currentRoom.east]);
-          console.log(player.currentRoom.enterRoom())
-          play();
-        }
-        else {
-          console.log("You can't go that way...")
-          play()
-        }
-      }
-      else if (directions.west.includes(direction) || direction === player.currentRoom.west) {
-        direction = 'west';
-        if (player.currentRoom.west) {
-          console.log('Moving west...')
-          player.changeRoom(obRooms[player.currentRoom.west]);
-          console.log(player.currentRoom.enterRoom())
-          play();
-        }
-        else {
-          console.log("You can't go that way...")
-          play()
-        }
-      }
+
       else {
         console.log("That's not a valid direction.\nPlease choose one of the cardinal directions (n,s,e,w)");
         play()
       }
     }
   }
-
   else if (thisAction === 'xyzzy' && obRooms[focus]) {
     if (obRooms[focus].isLocked) {
       obRooms[focus].unlock()
