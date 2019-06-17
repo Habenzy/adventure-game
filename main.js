@@ -299,19 +299,18 @@ async function play() {
         focus = 'west'
       }
       let direction = focus;
-      if (directions[direction].includes(direction) || direction === player.currentRoom[direction].toLowerCase()) {
+      if (player.currentRoom[direction]) {
         console.log(`Moving ${direction}...`);
         player.changeRoom(obRooms[player.currentRoom[direction]]);
         console.log(player.currentRoom.enterRoom())
         play();
       }
-      else if (obRooms[player.currentRoom][direction] == undefined) {
-        console.log("You can't go that way...")
+      else if (direction !== 'north' && direction !== 'south' && direction !== 'east' && direction !== 'west') {
+        console.log("That's not a valid direction\nPlease choose one of the cardinal directions (n,s,e,w)");
         play()
       }
-
       else {
-        console.log("That's not a valid direction.\nPlease choose one of the cardinal directions (n,s,e,w)");
+        console.log("You can't go that way...")
         play()
       }
     }
