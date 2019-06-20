@@ -45,6 +45,9 @@ const player = {
     }
   },
 
+  //drop item
+  //make item
+
   //use items
   useItem: (item) => {
     item.action()
@@ -111,14 +114,8 @@ const commands = {
   examine: ['look', 'examine', 'check', 'study', 'inspect'],
   take: ['pick', 'take', 'grab', 'steal', 'buy'],
   use: ['use', 'give', 'eat', 'drink'],
-  unlock: ['unlock', 'open']
-}
-
-const directions = {
-  north: ['n', 'north'],
-  south: ['s', 'south'],
-  east: ['e', 'east'],
-  west: ['w', 'west']
+  unlock: ['unlock', 'open'],
+  immolate: ['immolate', 'ignite', 'light', 'burn']
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -367,6 +364,7 @@ async function play() {
     }
   }
 
+  //Unlock rooms
   else if (commands.unlock.includes(thisAction)) {
     if (player.inventory.includes(key)) {
       key.action();
@@ -378,6 +376,14 @@ async function play() {
     }
   }
 
+  else if (commands.immolate.includes(thisAction)) {
+    if (obObjs[focus] === stick) {
+
+    }
+
+  }
+
+  //Catch all for unexpected actions
   else {
     console.log("I don't know how to " + thisAction);
     play();
@@ -387,6 +393,5 @@ async function play() {
 startGame();
 
 //To Do:
-//  NPCs or the myst approach? Which should I do? NPCs would need another chunk of behavioral code & class template...
-// create an actual narative/world
-
+// build out city and cave network
+// make more items, and puzzles
