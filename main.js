@@ -11,6 +11,8 @@ function ask(questionText) {
   });
 };
 
+//made some changes
+
 //------------------------------------------------------------------------------------------------------------------------
 //Rule sets and templates
 
@@ -164,7 +166,16 @@ const fieldE = new Room('fieldE', "You stand amidst a field of ripe wheat. A riv
 const fieldW = new Room('fieldW', "You stand amidst a field of ripe wheat. An impassable mountain range shades\nthe Western side of the field.\nThe city walls tower over the Northern end of the field.\nTo the South the forest stretches into the distance...", [], null, 'forestW', 'fieldC', null);
 const mountains = new Room('mountains', "You hike into the mountains, however they quickly become too steep to climb...", [], null, null, 'foothills')
 const caveEnterance = new Room('caveEnterance', "The river rushes through a dark hole in the cliffs,\nand dissapears beneath the earth...", [], 'riverS')
-
+//significant buildings to be created:
+  //townEnterance
+  //mainStS
+  //townSquare
+  //mainStN
+  //palaceEnterance
+  //the entire palace complex
+  //the entire cave complex
+  //some houses for flavor
+  
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //lookup tables
 
@@ -245,8 +256,15 @@ async function play() {
   let focus = inputArray[inputArray.length - 1]
 
   //exit
-  if (sanInput === 'exit') {
-    process.exit()
+  if (sanInput === 'quit') {
+    let confirm = await ask('Are you sure you want to quit the game');
+    if (commands.affirmative.includes(confirm)) {
+      console.log('Goodbye.')
+      process.exit()
+    }
+    else {
+      play()
+    }
   }
 
   //show room inventory
@@ -283,16 +301,16 @@ async function play() {
       play()
     }
     else {
-      if (focus === 'n') {
+      if (focus === 'n' || focus === player.currentRoom.north) {
         focus = 'north'
       }
-      else if (focus === 's') {
+      else if (focus === 's' || focus === player.currentRoom.south) {
         focus = 'south'
       }
-      else if (focus === 'e') {
+      else if (focus === 'e' || focus === player.currentRoom.east) {
         focus = 'east'
       }
-      else if (focus === 'w') {
+      else if (focus === 'w' || focus === player.currentRoom.west) {
         focus = 'west'
       }
       let direction = focus;
@@ -377,10 +395,9 @@ async function play() {
   }
 
   else if (commands.immolate.includes(thisAction)) {
-    if (obObjs[focus] === stick) {
-
-    }
-
+    //just a place holder for now
+    console.log('YOU ARE ON FIRE!!!!\nYou have died...');
+    process.exit()
   }
 
   //Catch all for unexpected actions
@@ -394,4 +411,7 @@ startGame();
 
 //To Do:
 // build out city and cave network
-// make more items, and puzzles
+// make more items
+// make puzzles
+// combine items (will need to accept more than one focus, a la Marshall's code)
+
