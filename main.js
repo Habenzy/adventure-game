@@ -409,8 +409,13 @@ async function play() {
 
   //Light things on FIRE!!!!!!!!!!!!!!
   else if (commands.immolate.includes(thisAction)) {
-    if (obObjs[focus] === stick) {
-
+    if (obObjs[focus] && obObjs[focus].name === 'stick') {
+      console.log("The stick burns merrily for a second...")
+      player.dropItem("stick")
+      play()
+    } else {
+      console.log("The fire spreads quickly... too quickly\nThere is no escape. You have died...")
+      process.exit()
     }
 
   }
