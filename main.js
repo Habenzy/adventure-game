@@ -28,7 +28,7 @@ const player = {
   //move
   changeRoom: (room) => {
     if (!room.isLocked) {
-      player.currentRoom = room
+      this.currentRoom = room
     } else {
       console.log(`The ${room.name} is locked...`)
     }
@@ -37,8 +37,8 @@ const player = {
   //pick up
   pickUp: (item) => {
     if (item.takeable === true) {
-      player.inventory.push(item);
-      player.currentRoom.inventory.pop(item)
+      this.inventory.push(item);
+      this.currentRoom.removeItem(item);
       return `You pick up a ${item.name}`
     } else {
       return "You can't take that"
@@ -46,6 +46,14 @@ const player = {
   },
 
   //drop item
+  dropItem: (itemName) => {
+    let item = this.inventory.find((object) => {
+      return object.name === itemName
+    })
+    let dropped = this.inventory.splice(this.inventory.indexOf(item), 1);
+
+    this.currentRoom.addItem(dropped)
+  },
   //make item
 
   //use items
@@ -81,8 +89,16 @@ class Room {
       }
     };
 
-    this.removeItem = (item) => {
-      this.inventory.pop(item)
+    this.removeItem = (itemName) => {
+      let item = this.inventory.find((object) => {
+        return object.name === itemName
+      })
+
+      this.inventory.splice(this.inventory.indexOf(item), 1);
+    };
+
+    this.addItem = (item) => {
+      this.inventory.push(item)
     };
 
     this.examineItem = (item) => {
@@ -115,7 +131,8 @@ const commands = {
   take: ['pick', 'take', 'grab', 'steal', 'buy'],
   use: ['use', 'give', 'eat', 'drink'],
   unlock: ['unlock', 'open'],
-  immolate: ['immolate', 'ignite', 'light', 'burn']
+  immolate: ['immolate', 'ignite', 'light', 'burn'],
+  drop: ['drop', 'remove']
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -225,6 +242,7 @@ async function startGame() {
   player.name = userName;
   let init = await ask(`Welcome ${player.name}. You are about to embark on a text based adventure;\nplease type your actions in the format [action] [item].\nTo move to a new area use [move] [direction].\nTo view your inventory type 'j' to view the room's inventory type 'i'\nAre you ready to start your journey?\n>_ `);
   if (commands.affirmative.includes(init.toLowerCase())) {
+    //start the player in the canyon on a new game
     console.log(canyon.enterRoom());
     player.currentRoom = canyon
     play()
@@ -272,7 +290,7 @@ async function play() {
   }
 
   else if (thisAction === 'linger' && player.currentRoom.name.includes('Forest')) {
-    console.log("As you linger in the forest you hear movement all around you.\nFirst one pair of glowing red eyes appears through the undergrowth,\nthen another, then a hundred more.  All at once the beasts pounce on you\ntearing you to pieces in an explosion of gore.\nYou have died.");
+    console.log("As you linger in the forest you hear movement all around you.\nFirst one pair of glowing red eyes appears through the undergrowth,\nthen another, then a hundred more.  All at once the beasts pounce on you\ntearing you to pieces in an explosion of gore.\nYou have died...");
     process.exit();
   }
 
@@ -364,6 +382,18 @@ async function play() {
     }
   }
 
+  //Drop Item
+  else if (commands.drop.includes(thisAction)) {
+    let item = obObjs[focus]
+    if (item && player.inventory.includes(item)) {
+      player.dropItem(item.name)
+      play()
+    } else {
+      console.log(`You do not have ${focus}...`)
+      play()
+    }
+  }
+
   //Unlock rooms
   else if (commands.unlock.includes(thisAction)) {
     if (player.inventory.includes(key)) {
@@ -376,6 +406,7 @@ async function play() {
     }
   }
 
+  //Light things on FIRE!!!!!!!!!!!!!!
   else if (commands.immolate.includes(thisAction)) {
     if (obObjs[focus] === stick) {
 
