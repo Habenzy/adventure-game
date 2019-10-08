@@ -28,7 +28,7 @@ const player = {
   //move
   changeRoom: (room) => {
     if (!room.isLocked) {
-      this.currentRoom = room
+      player.currentRoom = room
     } else {
       console.log(`The ${room.name} is locked...`)
     }
@@ -37,8 +37,8 @@ const player = {
   //pick up
   pickUp: (item) => {
     if (item.takeable === true) {
-      this.inventory.push(item);
-      this.currentRoom.removeItem(item);
+      player.inventory.push(item);
+      player.currentRoom.removeItem(item);
       return `You pick up a ${item.name}`
     } else {
       return "You can't take that"
@@ -47,12 +47,12 @@ const player = {
 
   //drop item
   dropItem: (itemName) => {
-    let item = this.inventory.find((object) => {
+    let item = player.inventory.find((object) => {
       return object.name === itemName
     })
-    let dropped = this.inventory.splice(this.inventory.indexOf(item), 1);
-
-    this.currentRoom.addItem(dropped)
+    let dropped = player.inventory.splice(player.inventory.indexOf(item), 1);
+    console.log(dropped)
+    player.currentRoom.addItem(dropped)
   },
   //make item
 
@@ -387,6 +387,7 @@ async function play() {
     let item = obObjs[focus]
     if (item && player.inventory.includes(item)) {
       player.dropItem(item.name)
+      console.log(`You drop ${item.name}`)
       play()
     } else {
       console.log(`You do not have ${focus}...`)
