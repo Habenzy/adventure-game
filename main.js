@@ -21,24 +21,24 @@ const player = {
   inventory: [],
   status: [],
 
-  lookAround: () => {
+  lookAround() {
     return this.currentRoom.description
   },
 
   //move
-  changeRoom: (room) => {
+  changeRoom(room) {
     if (!room.isLocked) {
-      player.currentRoom = room
+      this.currentRoom = room
     } else {
       console.log(`The ${room.name} is locked...`)
     }
   },
 
   //pick up
-  pickUp: (item) => {
+  pickUp(item) {
     if (item.takeable === true) {
-      player.inventory.push(item);
-      player.currentRoom.removeItem(item);
+      this.inventory.push(item);
+      this.currentRoom.removeItem(item);
       return `You pick up a ${item.name}`
     } else {
       return "You can't take that"
@@ -46,18 +46,30 @@ const player = {
   },
 
   //drop item
-  dropItem: (itemName) => {
-    let item = player.inventory.find((object) => {
+  dropItem(itemName) {
+    let item = this.inventory.find((object) => {
       return object.name === itemName
     })
-    let dropped = player.inventory.splice(player.inventory.indexOf(item), 1);
-    console.log(dropped)
-    player.currentRoom.addItem(dropped)
+    let dropped = this.inventory.splice(player.inventory.indexOf(item), 1);
+    //console.log(dropped)
+    this.currentRoom.addItem(dropped)
   },
+
   //make item
+  combine(item1, item2) {
+    if (item1.combination[item2]) {
+      let newItem = item1.combination[item2]
+      this.inventory.push(newItem)
+      this.dropItem(item1.name)
+      this.dropItem(item2)
+      return `You have crafted a(n) ${newItem}!`
+    } else {
+      return `You can't combine ${item1.name} and ${item2}.`
+    }
+  },
 
   //use items
-  useItem: (item) => {
+  useItem (item) {
     item.action()
   }
 }
@@ -114,12 +126,13 @@ class Room {
 
 //Items object definition
 class InvObj {
-  constructor(name, desc, takeable, action) {
+  constructor(name, desc, takeable, action, combination) {
     //name and desc should be strings, takeable is a boolean, action should be a function
     this.name = name;
     this.description = desc;
     this.takeable = takeable;
-    this.action = action
+    this.action = action;
+    this.combination = combination || []
   }
 }
 
@@ -132,13 +145,18 @@ const commands = {
   use: ['use', 'give', 'eat', 'drink'],
   unlock: ['unlock', 'open'],
   immolate: ['immolate', 'ignite', 'light', 'burn'],
-  drop: ['drop', 'remove']
+  drop: ['drop', 'remove'],
+  craft: ['craft', 'make', 'combine', 'modify']
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//object definitions
+const wordIgnore = ['and', 'to', 'a', 'of', 'the', 'with']
 
-//objects list MUST BE BEFORE ROOMS
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//object definitions MUST BE BEFORE ROOMS
+
+//craftable objects
+
+//findable objects
 const stick = new InvObj('stick', 'A seemingly ordinary stick', true, () => { console.log('The stick breaks...'); player.inventory.pop(stick) });
 const rock = new InvObj('rock', 'A rock. Not very exciting, but something shiney catches your eye...', false, () => { console.log('The rock is impervious, heavy, and boring. You should probably leave it be...') });
 const key = new InvObj('key', 'A small key you found amongst the rocks', true, () => {
@@ -258,7 +276,13 @@ async function startGame() {
 async function play() {
   let input = await ask('>_')
   let sanInput = input.toLowerCase()
-  let inputArray = sanInput.split(' ');
+  let inputArr = sanInput.split(' ');
+  let inputArray = inputArr.filter(word => {
+    /// removes useless words
+    if (!wordIgnore.includes(word)) {
+      return word;
+    }
+  })
   let thisAction = inputArray[0];
   let focus = inputArray[inputArray.length - 1]
 
@@ -271,10 +295,10 @@ async function play() {
   else if (sanInput === 'i') {
     if (player.currentRoom.inventory.length === 0) {
       console.log("There is nothing here...")
-      play();
+      return play();
     } else {
       player.currentRoom.inventory.forEach(obj => console.log(obj.name))
-      play();
+      return play();
     }
   }
 
@@ -282,13 +306,14 @@ async function play() {
   else if (sanInput === 'j') {
     if (player.inventory.length === 0) {
       console.log("What's it got it it's pocketses? Nothing, apparently...")
-      play();
+      return play();
     } else {
       player.inventory.forEach(obj => console.log(obj.name));
-      play();
+      return play();
     }
   }
 
+  //if you're in the forest and you linger you die
   else if (thisAction === 'linger' && player.currentRoom.name.includes('Forest')) {
     console.log("As you linger in the forest you hear movement all around you.\nFirst one pair of glowing red eyes appears through the undergrowth,\nthen another, then a hundred more.  All at once the beasts pounce on you\ntearing you to pieces in an explosion of gore.\nYou have died...");
     process.exit();
@@ -297,8 +322,8 @@ async function play() {
   //move
   else if (commands.move.includes(thisAction)) {
     if (inputArray.length === 1) {
-      console.log('When beset be fear or doubt\nRun in circles\nScream and shout.');
-      play()
+      console.log('When beset by fear or doubt\nRun in circles\nScream and shout.');
+      return play()
     }
     else {
       if (focus === 'n') {
@@ -318,15 +343,15 @@ async function play() {
         console.log(`Moving ${direction}...`);
         player.changeRoom(obRooms[player.currentRoom[direction]]);
         console.log(player.currentRoom.enterRoom())
-        play();
+        return play();
       }
       else if (direction !== 'north' && direction !== 'south' && direction !== 'east' && direction !== 'west') {
         console.log("That's not a valid direction\nPlease choose one of the cardinal directions (n,s,e,w)");
-        play()
+        return play()
       }
       else {
         console.log("You can't go that way...")
-        play()
+        return play()
       }
     }
   }
@@ -336,25 +361,25 @@ async function play() {
     }
     player.changeRoom(obRooms[focus])
     console.log(player.currentRoom.enterRoom())
-    play();
+    return play();
   }
 
   //examine objects
   else if (commands.examine.includes(thisAction) && player.currentRoom.inventory.includes(obObjs[focus])) {
     let item = focus;
     console.log(obObjs[item].description)
-    play();
+    return play();
   }
   else if (commands.examine.includes(thisAction) && player.inventory.includes(obObjs[focus])) {
     let item = focus;
     console.log(obObjs[item].description)
-    play();
+    return play();
   }
 
   //examine room
   else if (commands.examine.includes(thisAction)) {
     console.log(player.currentRoom.description);
-    play();
+    return play();
   }
 
   //pick up item
@@ -362,11 +387,11 @@ async function play() {
     let item = obObjs[focus]
     if (player.currentRoom.inventory.includes(item)) {
       console.log(player.pickUp(item));
-      play();
+      return play();
     }
     else {
       console.log(`You don't see any ${focus}s here...`)
-      play()
+      return play()
     }
   }
 
@@ -375,10 +400,10 @@ async function play() {
     let item = obObjs[focus]
     if (player.inventory.includes(item) || player.currentRoom.inventory.includes(item)) {
       item.action()
-      play();
+      return play();
     } else {
       console.log("You can't use what isn't here...");
-      play()
+      return play()
     }
   }
 
@@ -388,22 +413,27 @@ async function play() {
     if (item && player.inventory.includes(item)) {
       player.dropItem(item.name)
       console.log(`You drop ${item.name}`)
-      play()
+      return play()
     } else {
       console.log(`You do not have ${focus}...`)
-      play()
+      return play()
     }
+  }
+
+  //craft item
+  else if (commands.craft.includes(this.action)) {
+
   }
 
   //Unlock rooms
   else if (commands.unlock.includes(thisAction)) {
     if (player.inventory.includes(key)) {
       key.action();
-      play()
+      return play()
     }
     else {
       console.log("You don't have a key...");
-      play()
+      return play()
     }
   }
 
@@ -412,7 +442,7 @@ async function play() {
     if (obObjs[focus] && obObjs[focus].name === 'stick') {
       console.log("The stick burns merrily for a second...")
       player.dropItem("stick")
-      play()
+      return play()
     } else {
       console.log("The fire spreads quickly... too quickly\nThere is no escape. You have died...")
       process.exit()
@@ -423,7 +453,7 @@ async function play() {
   //Catch all for unexpected actions
   else {
     console.log("I don't know how to " + thisAction);
-    play();
+    return play();
   }
 }
 
