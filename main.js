@@ -126,7 +126,7 @@ class InvObj {
 //acceptable commands
 const commands = {
   affirmative: ['yes', 'yesh', 'yup', 'y', 'yeah', 'ok', ''],
-  move: ['go', 'move', 'head', 'walk', 'run', 'crawl', 'skip', 'enter'],
+  move: ['go', 'move', 'head', 'walk', 'run', 'crawl', 'skip', 'enter', 'continue'],
   examine: ['look', 'examine', 'check', 'study', 'inspect'],
   take: ['pick', 'take', 'grab', 'steal', 'buy'],
   use: ['use', 'give', 'eat', 'drink'],
