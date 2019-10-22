@@ -21,24 +21,24 @@ const player = {
   inventory: [],
   status: [],
 
-  lookAround() {
+  lookAround: () => {
     return this.currentRoom.description
   },
 
   //move
-  changeRoom(room) {
+  changeRoom: (room) => {
     if (!room.isLocked) {
-      this.currentRoom = room
+      player.currentRoom = room
     } else {
       console.log(`The ${room.name} is locked...`)
     }
   },
 
   //pick up
-  pickUp(item) {
+  pickUp: (item) => {
     if (item.takeable === true) {
-      this.inventory.push(item);
-      this.currentRoom.removeItem(item);
+      player.inventory.push(item);
+      player.currentRoom.removeItem(item);
       return `You pick up a ${item.name}`
     } else {
       return "You can't take that"
@@ -46,30 +46,18 @@ const player = {
   },
 
   //drop item
-  dropItem(itemName) {
-    let item = this.inventory.find((object) => {
+  dropItem: (itemName) => {
+    let item = player.inventory.find((object) => {
       return object.name === itemName
     })
-    let dropped = this.inventory.splice(player.inventory.indexOf(item), 1);
+    let dropped = player.inventory.splice(player.inventory.indexOf(item), 1);
     //console.log(dropped)
-    this.currentRoom.addItem(dropped)
+    player.currentRoom.addItem(dropped[0])
   },
-
   //make item
-  combine(item1, item2) {
-    if (item1.combination[item2]) {
-      let newItem = item1.combination[item2]
-      this.inventory.push(newItem)
-      this.dropItem(item1.name)
-      this.dropItem(item2)
-      return `You have crafted a(n) ${newItem}!`
-    } else {
-      return `You can't combine ${item1.name} and ${item2}.`
-    }
-  },
 
   //use items
-  useItem (item) {
+  useItem: (item) => {
     item.action()
   }
 }
@@ -126,13 +114,12 @@ class Room {
 
 //Items object definition
 class InvObj {
-  constructor(name, desc, takeable, action, combination) {
+  constructor(name, desc, takeable, action) {
     //name and desc should be strings, takeable is a boolean, action should be a function
     this.name = name;
     this.description = desc;
     this.takeable = takeable;
-    this.action = action;
-    this.combination = combination || []
+    this.action = action
   }
 }
 
@@ -145,18 +132,13 @@ const commands = {
   use: ['use', 'give', 'eat', 'drink'],
   unlock: ['unlock', 'open'],
   immolate: ['immolate', 'ignite', 'light', 'burn'],
-  drop: ['drop', 'remove'],
-  craft: ['craft', 'make', 'combine', 'modify']
+  drop: ['drop', 'remove']
 }
 
-const wordIgnore = ['and', 'to', 'a', 'of', 'the', 'with']
-
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//object definitions MUST BE BEFORE ROOMS
+//object definitions
 
-//craftable objects
-
-//findable objects
+//objects list MUST BE BEFORE ROOMS
 const stick = new InvObj('stick', 'A seemingly ordinary stick', true, () => { console.log('The stick breaks...'); player.inventory.pop(stick) });
 const rock = new InvObj('rock', 'A rock. Not very exciting, but something shiney catches your eye...', false, () => { console.log('The rock is impervious, heavy, and boring. You should probably leave it be...') });
 const key = new InvObj('key', 'A small key you found amongst the rocks', true, () => {
@@ -198,7 +180,7 @@ const fieldC = new Room('fieldC', "A road leads through fields of golden wheat.\
 const fieldE = new Room('fieldE', "You stand amidst a field of ripe wheat. A river flows along the Eastern side of the field.\nThe city walls tower over the Northern end of the field.\nTo the South the forest stretches into the distance...", [], null, 'forestE', 'riverN', 'fieldC');
 const fieldW = new Room('fieldW', "You stand amidst a field of ripe wheat. An impassable mountain range shades\nthe Western side of the field.\nThe city walls tower over the Northern end of the field.\nTo the South the forest stretches into the distance...", [], null, 'forestW', 'fieldC', null);
 const mountains = new Room('mountains', "You hike into the mountains, however they quickly become too steep to climb...", [], null, null, 'foothills')
-const caveEnterance = new Room('caveEnterance', "The river rushes through a dark hole in the cliffs,\nand dissapears beneath the earth...", [], 'riverS')
+const caveEnterance = new Room('caveEnterance', "The river rushes through a dark hole in the cliffs,\nand disappears beneath the earth...", [], 'riverS')
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //lookup tables
@@ -276,13 +258,7 @@ async function startGame() {
 async function play() {
   let input = await ask('>_')
   let sanInput = input.toLowerCase()
-  let inputArr = sanInput.split(' ');
-  let inputArray = inputArr.filter(word => {
-    /// removes useless words
-    if (!wordIgnore.includes(word)) {
-      return word;
-    }
-  })
+  let inputArray = sanInput.split(' ');
   let thisAction = inputArray[0];
   let focus = inputArray[inputArray.length - 1]
 
@@ -295,10 +271,10 @@ async function play() {
   else if (sanInput === 'i') {
     if (player.currentRoom.inventory.length === 0) {
       console.log("There is nothing here...")
-      return play();
+      play();
     } else {
       player.currentRoom.inventory.forEach(obj => console.log(obj.name))
-      return play();
+      play();
     }
   }
 
@@ -306,15 +282,14 @@ async function play() {
   else if (sanInput === 'j') {
     if (player.inventory.length === 0) {
       console.log("What's it got it it's pocketses? Nothing, apparently...")
-      return play();
+      play();
     } else {
       player.inventory.forEach(obj => console.log(obj.name));
-      return play();
+      play();
     }
   }
 
-  //if you're in the forest and you linger you die
-  else if (thisAction === 'linger' && player.currentRoom.name.includes('Forest')) {
+  else if (thisAction === 'linger' && player.currentRoom.name.toLowerCase().includes('forest')) {
     console.log("As you linger in the forest you hear movement all around you.\nFirst one pair of glowing red eyes appears through the undergrowth,\nthen another, then a hundred more.  All at once the beasts pounce on you\ntearing you to pieces in an explosion of gore.\nYou have died...");
     process.exit();
   }
@@ -322,8 +297,8 @@ async function play() {
   //move
   else if (commands.move.includes(thisAction)) {
     if (inputArray.length === 1) {
-      console.log('When beset by fear or doubt\nRun in circles\nScream and shout.');
-      return play()
+      console.log('When beset be fear or doubt\nRun in circles\nScream and shout.');
+      play()
     }
     else {
       if (focus === 'n') {
@@ -343,15 +318,15 @@ async function play() {
         console.log(`Moving ${direction}...`);
         player.changeRoom(obRooms[player.currentRoom[direction]]);
         console.log(player.currentRoom.enterRoom())
-        return play();
+        play();
       }
       else if (direction !== 'north' && direction !== 'south' && direction !== 'east' && direction !== 'west') {
         console.log("That's not a valid direction\nPlease choose one of the cardinal directions (n,s,e,w)");
-        return play()
+        play()
       }
       else {
         console.log("You can't go that way...")
-        return play()
+        play()
       }
     }
   }
@@ -361,25 +336,25 @@ async function play() {
     }
     player.changeRoom(obRooms[focus])
     console.log(player.currentRoom.enterRoom())
-    return play();
+    play();
   }
 
   //examine objects
   else if (commands.examine.includes(thisAction) && player.currentRoom.inventory.includes(obObjs[focus])) {
     let item = focus;
     console.log(obObjs[item].description)
-    return play();
+    play();
   }
   else if (commands.examine.includes(thisAction) && player.inventory.includes(obObjs[focus])) {
     let item = focus;
     console.log(obObjs[item].description)
-    return play();
+    play();
   }
 
   //examine room
   else if (commands.examine.includes(thisAction)) {
     console.log(player.currentRoom.description);
-    return play();
+    play();
   }
 
   //pick up item
@@ -387,11 +362,11 @@ async function play() {
     let item = obObjs[focus]
     if (player.currentRoom.inventory.includes(item)) {
       console.log(player.pickUp(item));
-      return play();
+      play();
     }
     else {
       console.log(`You don't see any ${focus}s here...`)
-      return play()
+      play()
     }
   }
 
@@ -400,10 +375,10 @@ async function play() {
     let item = obObjs[focus]
     if (player.inventory.includes(item) || player.currentRoom.inventory.includes(item)) {
       item.action()
-      return play();
+      play();
     } else {
       console.log("You can't use what isn't here...");
-      return play()
+      play()
     }
   }
 
@@ -413,27 +388,22 @@ async function play() {
     if (item && player.inventory.includes(item)) {
       player.dropItem(item.name)
       console.log(`You drop ${item.name}`)
-      return play()
+      play()
     } else {
       console.log(`You do not have ${focus}...`)
-      return play()
+      play()
     }
-  }
-
-  //craft item
-  else if (commands.craft.includes(this.action)) {
-
   }
 
   //Unlock rooms
   else if (commands.unlock.includes(thisAction)) {
     if (player.inventory.includes(key)) {
       key.action();
-      return play()
+      play()
     }
     else {
       console.log("You don't have a key...");
-      return play()
+      play()
     }
   }
 
@@ -442,7 +412,7 @@ async function play() {
     if (obObjs[focus] && obObjs[focus].name === 'stick') {
       console.log("The stick burns merrily for a second...")
       player.dropItem("stick")
-      return play()
+      play()
     } else {
       console.log("The fire spreads quickly... too quickly\nThere is no escape. You have died...")
       process.exit()
@@ -453,7 +423,7 @@ async function play() {
   //Catch all for unexpected actions
   else {
     console.log("I don't know how to " + thisAction);
-    return play();
+    play();
   }
 }
 
