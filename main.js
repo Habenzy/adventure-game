@@ -36,7 +36,7 @@ const player = {
 
   //pick up
   pickUp: (item) => {
-    if (item.takeable === true) {
+    if (item.takeable) {
       player.inventory.push(item);
       player.currentRoom.removeItem(item);
       return `You pick up a ${item.name}`
@@ -139,7 +139,7 @@ const commands = {
 //object definitions
 
 //objects list MUST BE BEFORE ROOMS
-const stick = new InvObj('stick', 'A seemingly ordinary stick', true, () => { console.log('The stick breaks...'); player.inventory.pop(stick) });
+const stick = new InvObj('stick', 'A seemingly ordinary stick', true, () => { console.log('The stick breaks...'); player.inventory.pop(stick) });//refactor removal of stick
 const rock = new InvObj('rock', 'A rock. Not very exciting, but something shiney catches your eye...', false, () => { console.log('The rock is impervious, heavy, and boring. You should probably leave it be...') });
 const key = new InvObj('key', 'A small key you found amongst the rocks', true, () => {
   if (player.currentRoom.north && obRooms[player.currentRoom.north].isLocked) {
@@ -257,7 +257,7 @@ async function startGame() {
 //game mechanics
 async function play() {
   let input = await ask('>_')
-  let sanInput = input.toLowerCase()
+  let sanInput = input.toLowerCase().trim()
   let inputArray = sanInput.split(' ');
   let thisAction = inputArray[0];
   let focus = inputArray[inputArray.length - 1]
@@ -318,15 +318,15 @@ async function play() {
         console.log(`Moving ${direction}...`);
         player.changeRoom(obRooms[player.currentRoom[direction]]);
         console.log(player.currentRoom.enterRoom())
-        play();
+        return await play();
       }
       else if (direction !== 'north' && direction !== 'south' && direction !== 'east' && direction !== 'west') {
         console.log("That's not a valid direction\nPlease choose one of the cardinal directions (n,s,e,w)");
-        play()
+        return await play()
       }
       else {
         console.log("You can't go that way...")
-        play()
+        return await play()
       }
     }
   }
