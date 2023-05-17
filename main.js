@@ -1,17 +1,5 @@
-const readline = require('readline');
-
-const readlineInterface = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-function ask(questionText) {
-  return new Promise((resolve, reject) => {
-    readlineInterface.question(questionText, resolve);
-  });
-};
-
-//------------------------------------------------------------------------------------------------------------------------
+const express = require('express')
+const app = express()
 //Rule sets and templates
 
 //player object
@@ -236,7 +224,7 @@ const obRooms = {
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //actual game implementation definition
 
-async function startGame() {
+async function startGame(req, res) {
   player.name = null;
   let userName = await ask('Greetings adventurer! What is your name?\n>_ ');
   player.name = userName;
