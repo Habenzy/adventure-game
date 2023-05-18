@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./App.css";
 
 function App() {
@@ -7,15 +7,19 @@ function App() {
 
   async function submitAction(evt) {
     evt.preventDefault();
+    //send form input to server-side game handler
     const response = await fetch("/act", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ input: input })
     });
+    //parse and combine with previous input's and results
     const jsonRes = await response.json();
     const actionList = interactions.concat([jsonRes]);
-    console.log(actionList)
+    //display updated results
     setInteractions(actionList);
+    //clear form
+    setInput("")
   }
 
   return (
@@ -24,8 +28,8 @@ function App() {
         {interactions.length ? (
           interactions.map((interaction, i) => (
             <section key={i}>
-              <p>{interaction.request}</p>
-              <p>{interaction.display}</p>
+              <pre>{interaction.request}</pre>
+              <pre>{interaction.display}</pre>
             </section>
           ))
         ) : (
