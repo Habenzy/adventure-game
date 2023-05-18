@@ -4,6 +4,7 @@ const app = express();
 const port = process.env.PORT || 5500;
 
 app.use(express.static("client/dist"));
+app.use(express.json())
 //Rule sets and templates
 
 let gameStarted = false;
@@ -448,10 +449,11 @@ async function startGame(req, res) {
   let userName = req.body.input;
   player.name = userName;
   player.currentRoom = canyon;
+  gameStarted = true
 
   res.json({
-    input: "",
-    output: `Welcome ${
+    request: "",
+    display: `Welcome ${
       player.name
     }. You are about to embark on a text based adventure;\nplease type your actions in the format [action] [item].\nTo move to a new area use [move] [direction].\nTo view your inventory type 'j' to view the room's inventory type 'i'\nIt's time to start your journey!\n${canyon.enterRoom()}`,
   });
@@ -648,6 +650,7 @@ async function play(req, res) {
 
 //Server routes
 app.post("/act", (req, res) => {
+  console.log(req.body)
   if (!gameStarted) {
     startGame(req, res);
   } else {

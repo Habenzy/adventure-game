@@ -7,10 +7,14 @@ function App() {
 
   async function submitAction(evt) {
     evt.preventDefault();
-    const response = await fetch("/act", {method: "POST"});
+    const response = await fetch("/act", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input: input })
+    });
     const jsonRes = await response.json();
     const actionList = interactions.concat([jsonRes]);
-
+    console.log(actionList)
     setInteractions(actionList);
   }
 
@@ -30,10 +34,10 @@ function App() {
       </div>
       <form onSubmit={submitAction}>
         <label id="blink-cursor" htmlFor="input">
-          {">_"}
+          {">_ "}
         </label>
         <input
-          name="input"
+          id="input"
           type="text"
           placeholder="please type your actions in the format [action] [item]"
           value={input}
@@ -41,6 +45,7 @@ function App() {
             setInput(evt.target.value);
           }}
         />
+        <input type="submit" />
       </form>
     </>
   );
