@@ -4,7 +4,7 @@ const app = express();
 const port = process.env.PORT || 5500;
 
 app.use(express.static("client/dist"));
-app.use(express.json())
+app.use(express.json());
 //Rule sets and templates
 
 let gameStarted = false;
@@ -101,7 +101,7 @@ class Room {
     };
 
     this.enterRoom = () => {
-      return this.name + "\n" + this.description;
+      return this.name + "<br>" + this.description;
     };
   }
 }
@@ -149,8 +149,7 @@ const stick = new InvObj(
   true,
   (req, res) => {
     player.inventory.splice(player.inventory.indexOf(stick, 1));
-    res.json({request: input, display:"The stick breaks..."});
-    
+    res.json({ request: input, display: "The stick breaks..." });
   }
 ); //refactor removal of stick
 const rock = new InvObj(
@@ -158,10 +157,11 @@ const rock = new InvObj(
   "A rock. Not very exciting, but something shiney catches your eye...",
   false,
   (req, res) => {
-    res.json({request: input, display:
-      "The rock is impervious, heavy, and boring. You should probably leave it be..."
-    }
-    );
+    res.json({
+      request: input,
+      display:
+        "The rock is impervious, heavy, and boring. You should probably leave it be...",
+    });
   }
 );
 const key = new InvObj(
@@ -173,24 +173,39 @@ const key = new InvObj(
       player.currentRoom.north &&
       obRooms[player.currentRoom.north].isLocked
     ) {
-      res.json({request: input, display:obRooms[player.currentRoom.north].unlock()});
+      res.json({
+        request: input,
+        display: obRooms[player.currentRoom.north].unlock(),
+      });
     } else if (
       player.currentRoom.south &&
       obRooms[player.currentRoom.south].isLocked
     ) {
-      res.json({request: input, display:obRooms[player.currentRoom.south].unlock()});
+      res.json({
+        request: input,
+        display: obRooms[player.currentRoom.south].unlock(),
+      });
     } else if (
       player.currentRoom.east &&
       obRooms[player.currentRoom.east].isLocked
     ) {
-      res.json({request: input, display:obRooms[player.currentRoom.east].unlock()});
+      res.json({
+        request: input,
+        display: obRooms[player.currentRoom.east].unlock(),
+      });
     } else if (
       player.currentRoom.west &&
       obRooms[player.currentRoom.west].isLocked
     ) {
-      res.json({request: input, display:obRooms[player.currentRoom.west].unlock()});
+      res.json({
+        request: input,
+        display: obRooms[player.currentRoom.west].unlock(),
+      });
     } else {
-      res.json({request: input, display:"There is nothing to unlock here..."});
+      res.json({
+        request: input,
+        display: "There is nothing to unlock here...",
+      });
     }
   }
 );
@@ -198,13 +213,13 @@ const key = new InvObj(
 //room definitions
 const canyon = new Room(
   "canyon",
-  "You stand in a canyon completely blocked in on three sides.\nThe cannyon is littered with rocks. Your only path out lies to the north...",
+  "You stand in a canyon completely blocked in on three sides.<br>The cannyon is littered with rocks. Your only path out lies to the north...",
   [rock, key],
   "field"
 );
 const field = new Room(
   "field",
-  "You stand in an open field surrounded by forboding forests.\nTo the south a line of cliffs stretches, broken only by a narrow canyon.\nSticks litter the ground...",
+  "You stand in an open field surrounded by forboding forests.<br>To the south a line of cliffs stretches, broken only by a narrow canyon.<br>Sticks litter the ground...",
   new Array(10).fill(stick),
   "deepForest",
   "canyon",
@@ -232,7 +247,7 @@ const shack = new Room(
 shack.isLocked = true;
 const deepForestW = new Room(
   "deepForestW",
-  "The forest is deep, and dark.\nThe only paths through the tangled underbrush are game trails.\nThe trees seem to thin out to the East. There is a noticable rise to the west,\nand hazy mountain peaks rize above the treeline.\nTo the south is an unbroken line of cliffs",
+  "The forest is deep, and dark.<br>The only paths through the tangled underbrush are game trails.<br>The trees seem to thin out to the East. There is a noticable rise to the west,<br>and hazy mountain peaks rize above the treeline.<br>To the south is an unbroken line of cliffs",
   new Array(10).fill(stick),
   "glade",
   null,
@@ -250,7 +265,7 @@ const glade = new Room(
 );
 const foothills = new Room(
   "foothills",
-  "You come out of the forest into rolling hills.\nTo the west a mighty mountain range blocks out the sky.\nA plume of smoke drifts across the sky to the north...",
+  "You come out of the forest into rolling hills.<br>To the west a mighty mountain range blocks out the sky.<br>A plume of smoke drifts across the sky to the north...",
   [],
   "hutYard",
   null,
@@ -259,7 +274,7 @@ const foothills = new Room(
 );
 const hutYard = new Room(
   "hutYard",
-  "A small hut is nestled amongst the base of the mountains to the west.\nTo the East the forest looms. A road leads into cultivated fields to the North.\nRolling hills stretch as far as the eye can see to the south...",
+  "A small hut is nestled amongst the base of the mountains to the west.<br>To the East the forest looms. A road leads into cultivated fields to the North.<br>Rolling hills stretch as far as the eye can see to the south...",
   [],
   null,
   "foothills",
@@ -268,7 +283,7 @@ const hutYard = new Room(
 );
 const hut = new Room(
   "hut",
-  "The hut is a single room, cozy, and warm from the fire burning in the hearth.\nDespite the cleanliness of the cabin, and fire there are no signs of the occupants...",
+  "The hut is a single room, cozy, and warm from the fire burning in the hearth.<br>Despite the cleanliness of the cabin, and fire there are no signs of the occupants...",
   [],
   null,
   null,
@@ -277,7 +292,7 @@ const hut = new Room(
 hut.isLocked = true;
 const forestW = new Room(
   "forestW",
-  "The forest is dark and menacing, visibility is low\nand you hear animal noises all around. The trees seem to thin out to the North.\nIt would not be wise to linger...",
+  "The forest is dark and menacing, visibility is low<br>and you hear animal noises all around. The trees seem to thin out to the North.<br>It would not be wise to linger...",
   [],
   "fieldW",
   "glade",
@@ -286,7 +301,7 @@ const forestW = new Room(
 );
 const forest = new Room(
   "forest",
-  "The trees are thinner here.\nYou can see cultivated fields through the trees to the north...",
+  "The trees are thinner here.<br>You can see cultivated fields through the trees to the north...",
   [],
   "fieldC",
   "deepForest",
@@ -295,7 +310,7 @@ const forest = new Room(
 );
 const deepForest = new Room(
   "deepForest",
-  "The forest is dark and menacing, visibility is low\nand you hear animal noises all around.\nIt would be most unwise to linger...",
+  "The forest is dark and menacing, visibility is low<br>and you hear animal noises all around.<br>It would be most unwise to linger...",
   [],
   "forest",
   "field",
@@ -304,7 +319,7 @@ const deepForest = new Room(
 );
 const deepForestE = new Room(
   "deepForestE",
-  "The forest is dark and menacing, visibility is low\nand you hear animal noises all around. It would not be wise to linger.\nThe trees seem to thin a bit to the East, and the South...",
+  "The forest is dark and menacing, visibility is low<br>and you hear animal noises all around. It would not be wise to linger.<br>The trees seem to thin a bit to the East, and the South...",
   [],
   "forestE",
   "clearing",
@@ -313,7 +328,7 @@ const deepForestE = new Room(
 );
 const forestE = new Room(
   "forestE",
-  "The trees are thinner here.\nYou can see cultivated fields through the trees to the north.\nYou here the sound of running water to the East...",
+  "The trees are thinner here.<br>You can see cultivated fields through the trees to the north.<br>You here the sound of running water to the East...",
   [],
   "fieldE",
   "deepForestE",
@@ -322,7 +337,7 @@ const forestE = new Room(
 );
 const river = new Room(
   "river",
-  "You stand on the Western bank of a river flowing swiftly from South to North\nTo the West the forest looms...",
+  "You stand on the Western bank of a river flowing swiftly from South to North<br>To the West the forest looms...",
   [],
   "riverN",
   "riverS",
@@ -331,7 +346,7 @@ const river = new Room(
 );
 const riverS = new Room(
   "riverS",
-  "You stand on the Western bank of a river flowing swiftly from South to North\nTo the West the forest looms.\nThe southern cliffs can be seen above the treeline to the South...",
+  "You stand on the Western bank of a river flowing swiftly from South to North<br>To the West the forest looms.<br>The southern cliffs can be seen above the treeline to the South...",
   [],
   "river",
   "caveEnterance",
@@ -340,7 +355,7 @@ const riverS = new Room(
 );
 const riverN = new Room(
   "riverN",
-  "You stand on the Western bank of a river flowing swiftly from South to North\nTo the West cultivated fields spread into the distance.\nTo the North the river dissapears beneath the city walls...",
+  "You stand on the Western bank of a river flowing swiftly from South to North<br>To the West cultivated fields spread into the distance.<br>To the North the river dissapears beneath the city walls...",
   [],
   null,
   "river",
@@ -349,7 +364,7 @@ const riverN = new Room(
 );
 const fieldC = new Room(
   "fieldC",
-  "A road leads through fields of golden wheat.\nTo the north a set of massive gates are set into a gigantic wall.\nRoofs, and towers can be seen beyond the walls.\nMore fields stretch to the East and West. To the south the forest looms.\nEverything is earily silent...",
+  "A road leads through fields of golden wheat.<br>To the north a set of massive gates are set into a gigantic wall.<br>Roofs, and towers can be seen beyond the walls.<br>More fields stretch to the East and West. To the south the forest looms.<br>Everything is earily silent...",
   [],
   null,
   "forest",
@@ -358,7 +373,7 @@ const fieldC = new Room(
 );
 const fieldE = new Room(
   "fieldE",
-  "You stand amidst a field of ripe wheat. A river flows along the Eastern side of the field.\nThe city walls tower over the Northern end of the field.\nTo the South the forest stretches into the distance...",
+  "You stand amidst a field of ripe wheat. A river flows along the Eastern side of the field.<br>The city walls tower over the Northern end of the field.<br>To the South the forest stretches into the distance...",
   [],
   null,
   "forestE",
@@ -367,7 +382,7 @@ const fieldE = new Room(
 );
 const fieldW = new Room(
   "fieldW",
-  "You stand amidst a field of ripe wheat. An impassable mountain range shades\nthe Western side of the field.\nThe city walls tower over the Northern end of the field.\nTo the South the forest stretches into the distance...",
+  "You stand amidst a field of ripe wheat. An impassable mountain range shades<br>the Western side of the field.<br>The city walls tower over the Northern end of the field.<br>To the South the forest stretches into the distance...",
   [],
   null,
   "forestW",
@@ -384,7 +399,7 @@ const mountains = new Room(
 );
 const caveEnterance = new Room(
   "caveEnterance",
-  "The river rushes through a dark hole in the cliffs,\nand disappears beneath the earth...",
+  "The river rushes through a dark hole in the cliffs,<br>and disappears beneath the earth...",
   [],
   "riverS"
 );
@@ -449,13 +464,13 @@ async function startGame(req, res) {
   let userName = req.body.input;
   player.name = userName;
   player.currentRoom = canyon;
-  gameStarted = true
+  gameStarted = true;
 
   res.json({
     request: "",
     display: `Welcome ${
       player.name
-    }. You are about to embark on a text based adventure;\nplease type your actions in the format [action] [item].\nTo move to a new area use [move] [direction].\nTo view your inventory type 'j' to view the room's inventory type 'i'\nIt's time to start your journey!\n${canyon.enterRoom()}`,
+    }. You are about to embark on a text based adventure;<br>please type your actions in the format [action] [item].<br>To move to a new area use [move] [direction].<br>To view your inventory type 'j' to view the room's inventory type 'i'<br>It's time to start your journey!<br>${canyon.enterRoom()}`,
   });
 }
 
@@ -478,9 +493,7 @@ async function play(req, res) {
     if (player.currentRoom.inventory.length === 0) {
       res.json({ request: input, display: "There is nothing here..." });
     } else {
-      let objList = player.currentRoom.inventory.map((obj) =>
-        console.log(obj.name)
-      );
+      let objList = player.currentRoom.inventory.map((obj) => obj.name);
       res.json({ request: input, display: objList });
     }
   }
@@ -503,7 +516,7 @@ async function play(req, res) {
     res.json({
       request: input,
       display:
-        "As you linger in the forest you hear movement all around you.\nFirst one pair of glowing red eyes appears through the undergrowth,\nthen another, then a hundred more.  All at once the beasts pounce on you\ntearing you to pieces in an explosion of gore.\nYou have died...",
+        "As you linger in the forest you hear movement all around you.<br>First one pair of glowing red eyes appears through the undergrowth,<br>then another, then a hundred more.  All at once the beasts pounce on you<br>tearing you to pieces in an explosion of gore.<br>You have died...",
       gameOver: true,
     });
     gameStarted = false;
@@ -515,7 +528,7 @@ async function play(req, res) {
       res.json({
         request: input,
         display:
-          "When beset be fear or doubt\nRun in circles\nScream and shout.",
+          "When beset be fear or doubt<br>Run in circles<br>Scream and shout.",
       });
     } else {
       if (focus === "n") {
@@ -532,7 +545,7 @@ async function play(req, res) {
         player.changeRoom(obRooms[player.currentRoom[direction]]);
         res.json({
           request: input,
-          display: `Moving ${direction}...\n${player.currentRoom.enterRoom()}`,
+          display: `Moving ${direction}...<br>${player.currentRoom.enterRoom()}`,
         });
       } else if (
         direction !== "north" &&
@@ -543,7 +556,7 @@ async function play(req, res) {
         res.json({
           request: input,
           display:
-            "That's not a valid direction\nPlease choose one of the cardinal directions (n,s,e,w)",
+            "That's not a valid direction<br>Please choose one of the cardinal directions (n,s,e,w)",
         });
       } else {
         res.json({ request: input, display: "You can't go that way..." });
@@ -599,7 +612,7 @@ async function play(req, res) {
     ) {
       item.action(req, res);
     } else {
-      res.json({request: input, display:"You can't use what isn't here..."});
+      res.json({ request: input, display: "You can't use what isn't here..." });
     }
   }
 
@@ -608,11 +621,9 @@ async function play(req, res) {
     let item = obObjs[focus];
     if (item && player.inventory.includes(item)) {
       player.dropItem(item.name);
-      res.json({request: input, display:`You drop ${item.name}`});
-
+      res.json({ request: input, display: `You drop ${item.name}` });
     } else {
-      res.json({request: input, display:`You do not have ${focus}...`});
-
+      res.json({ request: input, display: `You do not have ${focus}...` });
     }
   }
 
@@ -620,10 +631,8 @@ async function play(req, res) {
   else if (commands.unlock.includes(thisAction)) {
     if (player.inventory.includes(key)) {
       key.action(req, res);
-
     } else {
-      res.json({request: input, display:"You don't have a key..."});
-
+      res.json({ request: input, display: "You don't have a key..." });
     }
   }
 
@@ -631,26 +640,30 @@ async function play(req, res) {
   else if (commands.immolate.includes(thisAction)) {
     if (obObjs[focus] && obObjs[focus].name === "stick") {
       player.dropItem("stick");
-      res.json({request: input, display:"The stick burns merrily for a second..."});
-      
+      res.json({
+        request: input,
+        display: "The stick burns merrily for a second...",
+      });
     } else {
-      gameStarted = false
-      res.json({request: input, display:
-        "The fire spreads quickly... too quickly\nThere is no escape. You have died...", gameOver: true
-    });
-
+      gameStarted = false;
+      res.json({
+        request: input,
+        display:
+          "The fire spreads quickly... too quickly<br>There is no escape. You have died...",
+        gameOver: true,
+      });
     }
   }
 
   //Catch all for unexpected actions
   else {
-    res.json({request: input, display:"I don't know how to " + thisAction});
+    res.json({ request: input, display: "I don't know how to " + thisAction });
   }
 }
 
 //Server routes
 app.post("/act", (req, res) => {
-  console.log(req.body)
+  console.log(req.body);
   if (!gameStarted) {
     startGame(req, res);
   } else {
