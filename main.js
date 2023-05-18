@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 5500;
 
-app.use(express.static("client/build"));
+app.use(express.static("client/dist"));
 //Rule sets and templates
 
 let gameStarted = false;
@@ -656,7 +656,7 @@ app.post("/act", (req, res) => {
 });
 
 app.get("*", (req, res) => {
-  res.sendFile(__dirname + "/client/build/index.html");
+  res.sendFile(__dirname + "/client/dist/index.html");
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
