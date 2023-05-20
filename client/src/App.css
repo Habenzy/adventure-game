@@ -1,22 +1,37 @@
 /* ---------------------------Output----------------------- */
 #display {
-
+  width: 75vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 /* story text styling */
 #display section {
-
+  width: 60vw
 }
 #display section pre {
-
+  text-decoration: wavy;
 }
 /* Initial prompt */
 #display p {
-
+  font-size: 1.5rem;
+  font-weight: 400;
 }
 /* ------------------------------Input--------------------- */
 form {
-
+  width: 70vw;
 }
-#blink-cursor {
 
+#blink-cursor {
+  animation: blink .8s infinite alternate;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
