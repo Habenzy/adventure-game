@@ -23,13 +23,13 @@ function App() {
   }
 
   return (
-    <>
+    <div id="game-area">
       <div id="display">
         {interactions.length ? (
           interactions.map((interaction, i) => (
-            <section key={i}>
-              <pre>{interaction.request}</pre>
-              <pre>{interaction.display}</pre>
+            <section key={i} className="interaction">
+              <pre className="user-input"><i>{interaction.request}</i></pre>
+              <pre className="action-result">{interaction.display}</pre>
             </section>
           ))
         ) : (
@@ -51,7 +51,7 @@ function App() {
         />
         <input type="submit" />
       </form>
-    </>
+    </div>
   );
 }
 
