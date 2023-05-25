@@ -7,7 +7,7 @@ function App() {
   const displayRef = useRef(null)
 
   function scrollToBottom () {
-    displayRef.current?.scrollIntoView({ behavior: "smooth" })
+    displayRef.current?.scrollIntoView({ behavior: "instant" })
   }
 
   async function submitAction(evt) {
@@ -44,7 +44,7 @@ function App() {
         ) : (
           <p>Greetings adventurer! What is your name?</p>
         )}
-        <div id="display-bottom" />
+        <div ref={displayRef} />
       </div>
       <form onSubmit={submitAction}>
         <label id="blink-cursor" htmlFor="input">

@@ -12,9 +12,6 @@ It's a pretty simple setup, just something to play around with really. The game 
 - Clone down this repository
 - `cd` into the directory
 - `npm install`
-- `cd client`
-- `npm install`
-- `cd ..` (you should be back at the root directory at this point)
 - `npm run build`
 - `npm start`
 - Pop your browser open and visit https://localhost:5500 to play the game
