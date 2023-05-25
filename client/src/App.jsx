@@ -43,7 +43,7 @@ function App() {
         <input
           id="input"
           type="text"
-          placeholder="please type your actions in the format [action] [item]"
+          placeholder="please type your actions in the format [action] [target]"
           value={input}
           onChange={(evt) => {
             setInput(evt.target.value);
