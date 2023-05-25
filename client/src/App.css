@@ -16,6 +16,7 @@
   height: 650px;
   border: 2px solid black;
   overflow-x: scroll;
+  margin: 15px;
 }
 /* story text styling */
 #display section {

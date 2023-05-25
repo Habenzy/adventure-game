@@ -1,9 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 function App() {
   const [interactions, setInteractions] = useState([]);
   const [input, setInput] = useState("");
+  const displayRef = useRef(null)
+
+  function scrollToBottom () {
+    displayRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
 
   async function submitAction(evt) {
     evt.preventDefault();
@@ -22,6 +27,10 @@ function App() {
     setInput("")
   }
 
+  useEffect(() => {
+    scrollToBottom()
+  }, [interactions])
+
   return (
     <div id="game-area">
       <div id="display">
@@ -35,6 +44,7 @@ function App() {
         ) : (
           <p>Greetings adventurer! What is your name?</p>
         )}
+        <div id="display-bottom" />
       </div>
       <form onSubmit={submitAction}>
         <label id="blink-cursor" htmlFor="input">
