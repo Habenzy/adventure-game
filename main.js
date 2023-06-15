@@ -406,7 +406,7 @@ const obRooms = {
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //actual game implementation functions
 
-async function combat(req, res) {
+async function combat(enemies, req, res) {
 
 }
 
@@ -595,6 +595,13 @@ async function play(req, res) {
       res.json({request: input, display: "Talking to your self is the first sign of madness..."}) //implement madness mechanics?
   }
 
+  //fight NPCs
+  else if(commands.attack.includes(thisAction)) {
+    let enemies = player.currentRoom.npcs.map((npc) => npc.hostile)
+
+    enemies.length ? combat(enemies, req, res) : res.json({request: input, display: "No one here wants to fight you..."})
+  }
+
   //Light things on FIRE!!!!!!!!!!!!!!
   else if (commands.immolate.includes(thisAction)) {
     if (obObjs[focus] && obObjs[focus].name === "stick") {
@@ -638,4 +645,4 @@ app.listen(port, () => console.log(`Listening on port ${port}`));
 
 //To Do:
 // build out city and cave network
-// make more items, and puzzles
+// make NPCs, and build out combat system
