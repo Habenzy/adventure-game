@@ -1,10 +1,11 @@
 //Area creation
 class Room {
-  constructor(name, description, inventory, north, south, east, west) {
+  constructor(name, description, npcs, inventory, north, south, east, west) {
     //name and description should be strings, inventory is an array of objects, directions are strings
 
     this.name = name;
     this.description = description;
+    this.npcs = npcs || []
     this.inventory = inventory || [];
     this.isLocked = false;
     this.north = north || null;
