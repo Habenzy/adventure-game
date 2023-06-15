@@ -8,6 +8,7 @@ app.use(express.json());
 
 const Room = require('./game_templates/room.js')
 const InvObj = require('./game_templates/item.js')
+const Npc = require('./game_templates/npc.js')
 //Rule sets
 
 let gameStarted = false;
@@ -80,6 +81,8 @@ const commands = {
   unlock: ["unlock", "open"],
   immolate: ["immolate", "ignite", "light", "burn"],
   drop: ["drop", "remove"],
+  talk: ["talk", "speak", "yell", "whisper"],
+  attack: ["attack", "strike"]
 };
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -152,6 +155,8 @@ const key = new InvObj(
     }
   }
 );
+
+//NPC definitions
 
 //room definitions
 const canyon = new Room(
@@ -399,7 +404,11 @@ const obRooms = {
 };
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//actual game implementation definition
+//actual game implementation functions
+
+async function combat(req, res) {
+
+}
 
 async function startGame(req, res) {
   //initialize player object in starting location
@@ -577,6 +586,13 @@ async function play(req, res) {
     } else {
       res.json({ request: input, display: "You don't have a key..." });
     }
+  }
+
+  //talk to NPCs
+  else if (commands.talk.includes(thisAction)) {
+    player.currentRoom.npcs.length ? //should eventually be changed to target specific NPC, but I'm feeling lazy
+      res.json({request: input, display: player.currentRoom.npcs[0].questDialog}) :
+      res.json({request: input, display: "Talking to your self is the first sign of madness..."}) //implement madness mechanics?
   }
 
   //Light things on FIRE!!!!!!!!!!!!!!

@@ -7,3 +7,5 @@ class Npc {
     this.hostile = hostile || false
   }
 }
+
+module.exports = Npc
